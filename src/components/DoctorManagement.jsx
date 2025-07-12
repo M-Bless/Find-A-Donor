@@ -1,159 +1,149 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Pencil, Eye, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 
 const DoctorManagement = () => {
   const [doctors, setDoctors] = useState([
-    { id: 1, firstName: 'Lydia', lastName: 'Nanjala', email: 'lydia.nanjala@example.com', title: 'Nephrologist' },
-    { id: 2, firstName: 'James', lastName: 'Barasa', email: 'james.barasa@example.com', title: 'Transplant Surgeon' },
-    { id: 3, firstName: 'Grace', lastName: 'Odhiambo', email: 'grace.odhiambo@example.com', title: 'Physician' }
+    {
+      id: 'DR-001',
+      name: 'Dr. Lydia Nanjala',
+      specialization: 'Nephrologist',
+      phone: '+(254) 701 123 456',
+      email: 'lydia.nanjala@hospital.org',
+      patients: 34,
+      status: 'Active',
+      location: 'Nairobi Hospital',
+      lastActive: '2025-07-09',
+    },
+    {
+      id: 'DR-002',
+      name: 'Dr. Sarah Johnson',
+      specialization: 'Transplant Surgeon',
+      phone: '+1 (555) 567-8901',
+      email: 'sarah.johnson@clinic.com',
+      patients: 12,
+      status: 'On Leave',
+      location: 'Johns Hopkins',
+      lastActive: '2025-06-30',
+    },
+    {
+      id: 'DR-003',
+      name: 'Dr. Emmanuel Muriithi',
+      specialization: 'Dialysis Specialist',
+      phone: '+(254) 703 456 789',
+      email: 'emmanuel.muriithi@dialysis.org',
+      patients: 20,
+      status: 'Active',
+      location: 'Kenyatta National Hospital',
+      lastActive: '2025-07-10',
+    },
   ]);
 
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredDoctors = doctors.filter((doc) =>
+    doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doc.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doc.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const handleEdit = (doctor) => {
-    setSelectedDoctor(doctor);
-    setIsModalOpen(true);
+  const handleView = (doctor) => {
+    alert('Viewing: ' + doctor.name);
   };
 
-  const handleSave = () => {
-    setDoctors(doctors.map(doc => (doc.id === selectedDoctor.id ? selectedDoctor : doc)));
-    setIsModalOpen(false);
+  const handleEdit = (doctor) => {
+    alert('Editing: ' + doctor.name);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this doctor?')) {
+      setDoctors((prev) => prev.filter((doc) => doc.id !== id));
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
- {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-green-600 hover:text-green-700 transition duration-300">
-                Find A Donor
-              </Link>
-              <span className="ml-4 text-gray-500">|</span>
-              <h1 className="ml-4 text-xl font-semibold text-gray-900">Doctor Management</h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Link 
-                to="/hospital-admin" 
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/admin-profile" 
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-              >
-                Profile
-              </Link>
-              <Link 
-                to="/" 
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-              >
-                Logout
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 px-6 py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Doctor Management</h1>
+        <p className="text-gray-600">Manage doctors in the system</p>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">First Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Last Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Actions</th>
+      {/* Filter & Add Section */}
+      <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 flex-1">
+          <input
+            type="text"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            placeholder="Search by name, ID, or specialization..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select className="px-4 py-2 border border-gray-300 rounded-lg">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>On Leave</option>
+          </select>
+
+        </div>
+        <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+          + Add New Doctor
+        </button>
+      </div>
+
+      {/* Doctor Table */}
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="min-w-full table-auto divide-y divide-gray-200">
+          <thead className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+            <tr>
+              <th className="px-6 py-3">Doctor Info</th>
+              <th className="px-6 py-3">Specialization</th>
+              <th className="px-6 py-3">Location</th>
+              <th className="px-6 py-3">Patients</th>
+              <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">Last Active</th>
+              <th className="px-6 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-sm">
+            {filteredDoctors.map((doc) => (
+              <tr key={doc.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="font-medium text-gray-900">{doc.name}</div>
+                  <div className="text-gray-500 text-xs">{doc.id}</div>
+                  <div className="text-gray-500 text-xs">{doc.phone}</div>
+                </td>
+                <td className="px-6 py-4">{doc.specialization}</td>
+                <td className="px-6 py-4">{doc.location}</td>
+                <td className="px-6 py-4">{doc.patients}</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full font-semibold ${
+                      doc.status === 'Active'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {doc.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4">{doc.lastActive}</td>
+                <td className="px-6 py-4 space-x-2">
+                  <button onClick={() => handleView(doc)} className="text-green-600 hover:text-green-800" title="View">
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => handleEdit(doc)} className="text-blue-600 hover:text-blue-800" title="Edit">
+                    <Pencil className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => handleDelete(doc.id)} className="text-red-600 hover:text-red-800" title="Delete">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {doctors.map((doctor) => (
-                <tr key={doctor.id} className="border-t">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doctor.firstName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doctor.lastName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doctor.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doctor.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex items-center space-x-3">
-                      <button title="View" className="text-green-600 hover:text-green-900">
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      <button
-                        title="Edit"
-                        onClick={() => handleEdit(doctor)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Pencil className="w-5 h-5" />
-                      </button>
-                      <button title="Delete" className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-lg">
-              <h2 className="text-xl font-semibold mb-4">Edit Doctor</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  className="border p-2 rounded w-full"
-                  placeholder="First Name"
-                  value={selectedDoctor.firstName}
-                  onChange={(e) => setSelectedDoctor({ ...selectedDoctor, firstName: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="border p-2 rounded w-full"
-                  placeholder="Last Name"
-                  value={selectedDoctor.lastName}
-                  onChange={(e) => setSelectedDoctor({ ...selectedDoctor, lastName: e.target.value })}
-                />
-                <input
-                  type="email"
-                  className="col-span-2 border p-2 rounded w-full"
-                  placeholder="Email"
-                  value={selectedDoctor.email}
-                  onChange={(e) => setSelectedDoctor({ ...selectedDoctor, email: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="col-span-2 border p-2 rounded w-full"
-                  placeholder="Professional Title"
-                  value={selectedDoctor.title}
-                  onChange={(e) => setSelectedDoctor({ ...selectedDoctor, title: e.target.value })}
-                />
-              </div>
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
+            ))}
+          </tbody>
+        </table>
+        {filteredDoctors.length === 0 && (
+          <div className="text-center py-10 text-gray-500">No doctors found.</div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
