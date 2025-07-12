@@ -65,18 +65,27 @@ const PatientModal = ({ patient, isOpen, onClose, onSave, mode = 'view' }) => {
                 <div className="flex-shrink-0 h-12 w-12">
                   <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
                     <span className="text-lg font-medium text-green-600">
-                      {patient.name.split(' ').map(n => n[0]).join('')}
+                      {patient.name === '' 
+                        ? '+' 
+                        : patient.name.split(' ').map(n => n[0]).join('')
+                      }
                     </span>
                   </div>
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg leading-6 font-medium text-gray-900">
-                    {isEditing ? 'Edit Patient' : 'Patient Details'}
+                    {isEditing 
+                      ? (patient.name === '' ? 'Add New Patient' : 'Edit Patient') 
+                      : 'Patient Details'
+                    }
                   </h3>
                   <p className="text-sm text-gray-500">{patient.id}</p>
                   {isEditing && (
                     <p className="text-xs text-blue-600 mt-1">
-                      Current details are pre-filled. Modify only the fields you need to change.
+                      {patient.name === '' 
+                        ? 'Please fill in all required fields to add a new patient.'
+                        : 'Current details are pre-filled. Modify only the fields you need to change.'
+                      }
                     </p>
                   )}
                 </div>
@@ -304,7 +313,7 @@ const PatientModal = ({ patient, isOpen, onClose, onSave, mode = 'view' }) => {
                 onClick={handleSave}
                 className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm transition duration-300"
               >
-                Save Changes
+                {patient.name === '' ? 'Add Patient' : 'Save Changes'}
               </button>
               <button
                 onClick={handleCancel}

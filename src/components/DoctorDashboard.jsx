@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PatientModal from './PatientModal';
+import ScheduleModal from './ScheduleModal';
+import NotificationPanel from './NotificationPanel';
 
 const DoctorDashboard = () => {
   // Mock data
@@ -13,10 +15,91 @@ const DoctorDashboard = () => {
     activeTransplants: 12
   };
 
+  // Doctor profile data
+  const doctorInfo = {
+    name: 'Dr. Lydia Nanjala',
+    initials: 'LN',
+    specialty: 'Nephrology'
+  };
+
   // State for modal
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
+
+  // State for schedule modal
+  const [selectedSchedulePatient, setSelectedSchedulePatient] = useState(null);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+
+  // State for notifications
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'match_found',
+      title: 'Kidney Match Found!',
+      message: 'A compatible donor has been identified for Joseph Kimathi (KP-2024-178)',
+      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 minutes ago
+      read: false,
+      actionRequired: true,
+      patientInfo: {
+        name: 'Joseph Kimathi',
+        id: 'KP-2024-178',
+        bloodType: 'O+'
+      }
+    },
+    {
+      id: 2,
+      type: 'urgent_case',
+      title: 'Critical Patient Alert',
+      message: 'Patient Mary Wanjiru requires immediate attention - condition deteriorating',
+      timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+      read: false,
+      actionRequired: true,
+      patientInfo: {
+        name: 'Mary Wanjiru',
+        id: 'KP-2024-189',
+        bloodType: 'A-'
+      }
+    },
+    {
+      id: 3,
+      type: 'surgery_scheduled',
+      title: 'Surgery Scheduled',
+      message: 'Transplant surgery for Sarah Chepchumba scheduled for July 25, 2025',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      read: true,
+      actionRequired: false,
+      patientInfo: {
+        name: 'Sarah Chepchumba',
+        id: 'KP-2024-162',
+        bloodType: 'A-'
+      }
+    },
+    {
+      id: 4,
+      type: 'donor_approved',
+      title: 'Donor Approved',
+      message: 'Living donor David Kiprotich has been medically cleared for donation',
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+      read: true,
+      actionRequired: false
+    },
+    {
+      id: 5,
+      type: 'match_found',
+      title: 'Potential Match Identified',
+      message: 'System has identified 3 potential donors for James Baraka - review required',
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+      read: false,
+      actionRequired: true,
+      patientInfo: {
+        name: 'James Baraka',
+        id: 'KP-2024-003',
+        bloodType: 'B+'
+      }
+    }
+  ]);
 
   // Urgent cases data
   const urgentCases = [
@@ -95,6 +178,46 @@ const DoctorDashboard = () => {
     setSelectedPatient(null);
   };
 
+  // Schedule handlers
+  const handleScheduleTransplant = (patient = null) => {
+    setSelectedSchedulePatient(patient);
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleSaveSchedule = (scheduleData) => {
+    // In a real app, this would save to the database
+    console.log('Saving schedule:', scheduleData);
+    alert('Surgery scheduled successfully!');
+  };
+
+  const handleCloseScheduleModal = () => {
+    setIsScheduleModalOpen(false);
+    setSelectedSchedulePatient(null);
+  };
+
+  // Notification handlers
+  const handleNotificationToggle = () => {
+    setIsNotificationPanelOpen(!isNotificationPanelOpen);
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  };
+
+  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+
   const StatCard = ({ title, value, icon, bgColor, textColor, trend }) => (
     <div className={`${bgColor} rounded-lg shadow-lg p-6 transition duration-300 hover:shadow-xl`}>
       <div className="flex items-center justify-between">
@@ -121,8 +244,8 @@ const DoctorDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-green-600 hover:text-green-700 transition duration-300">
-                Find A Donor
+              <Link to="/" className="hover:opacity-80 transition duration-300">
+                <span className="text-2xl font-bold text-green-600">Find A Donor</span>
               </Link>
               <span className="ml-4 text-gray-500">|</span>
               <h1 className="ml-4 text-xl font-semibold text-gray-900">Dashboard</h1>
@@ -136,15 +259,51 @@ const DoctorDashboard = () => {
                 Patients
               </Link>
               <Link 
+                to="/schedule-management" 
+                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+              >
+                Schedule
+              </Link>
+              <Link 
                 to="/doctor-profile" 
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
               >
                 Profile
               </Link>
+              
+              {/* Doctor Profile Display */}
+              <div className="flex items-center space-x-3 px-3 py-1 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-green-600">{doctorInfo.initials}</span>
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-gray-900">{doctorInfo.name}</p>
+                  <p className="text-xs text-gray-500">{doctorInfo.specialty}</p>
+                </div>
+              </div>
+              
+              {/* Notification Bell */}
+              <button
+                onClick={handleNotificationToggle}
+                className="relative p-2 text-gray-500 hover:text-gray-700 rounded-md transition duration-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM12 17H7a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4h-5z" />
+                </svg>
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
+
               <Link 
                 to="/" 
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-300 border border-red-200 hover:border-red-300"
               >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
                 Logout
               </Link>
             </div>
@@ -273,36 +432,27 @@ const DoctorDashboard = () => {
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <button 
               onClick={handleAddPatient}
-              className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg transition duration-300 text-center"
+              className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg transition duration-300 text-center"
             >
-              <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span className="text-sm font-medium">Add Patient</span>
+              <span className="text-lg font-medium">Add New Patient</span>
+              <p className="text-sm opacity-80 mt-1">Register a new patient in the system</p>
             </button>
             
-            <button className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition duration-300 text-center">
-              <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="text-sm font-medium">Find Match</span>
-            </button>
-            
-            <button className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition duration-300 text-center">
-              <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span className="text-sm font-medium">View Reports</span>
-            </button>
-            
-            <button className="bg-teal-600 hover:bg-teal-700 text-white p-4 rounded-lg transition duration-300 text-center">
-              <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button 
+              onClick={() => handleScheduleTransplant()}
+              className="bg-teal-600 hover:bg-teal-700 text-white p-6 rounded-lg transition duration-300 text-center"
+            >
+              <svg className="w-8 h-8 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span className="text-sm font-medium">Schedule</span>
+              <span className="text-lg font-medium">Schedule Surgery</span>
+              <p className="text-sm opacity-80 mt-1">Schedule a transplant surgery</p>
             </button>
           </div>
         </div>
@@ -342,9 +492,15 @@ const DoctorDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button 
                       onClick={() => handleViewPatient(patient)}
-                      className="text-green-600 hover:text-green-900 transition duration-300"
+                      className="text-green-600 hover:text-green-900 transition duration-300 mr-4"
                     >
                       View Details
+                    </button>
+                    <button 
+                      onClick={() => handleScheduleTransplant(patient)}
+                      className="text-blue-600 hover:text-blue-900 transition duration-300"
+                    >
+                      Schedule Surgery
                     </button>
                   </td>
                 </tr>
@@ -362,6 +518,24 @@ const DoctorDashboard = () => {
         onClose={handleCloseModal}
         onSave={handleSavePatient}
         mode={modalMode}
+      />
+
+      {/* Schedule Modal */}
+      <ScheduleModal
+        patient={selectedSchedulePatient}
+        isOpen={isScheduleModalOpen}
+        onClose={handleCloseScheduleModal}
+        onSave={handleSaveSchedule}
+        mode="add"
+      />
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={isNotificationPanelOpen}
+        onClose={() => setIsNotificationPanelOpen(false)}
+        notifications={notifications}
+        onMarkAsRead={handleMarkAsRead}
+        onMarkAllAsRead={handleMarkAllAsRead}
       />
     </div>
   );

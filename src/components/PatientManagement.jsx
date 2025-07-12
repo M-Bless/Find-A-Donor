@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PatientModal from './PatientModal';
+import NotificationPanel from './NotificationPanel';
 
 const PatientManagement = () => {
+  // Doctor profile data
+  const doctorInfo = {
+    name: 'Dr. Lydia Nanjala',
+    initials: 'LN',
+    specialty: 'Nephrology'
+  };
+
   // Mock patient data - in a real app, this would come from an API
   const [patients, setPatients] = useState([
     {
@@ -84,6 +92,25 @@ const PatientManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
 
+  // State for notifications
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'match_found',
+      title: 'New Match Found!',
+      message: 'Compatible donor identified for patient James Baraka',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      read: false,
+      actionRequired: true,
+      patientInfo: {
+        name: 'James Baraka',
+        id: 'KP-2024-003',
+        bloodType: 'B+'
+      }
+    }
+  ]);
+
   // Filter patients based on search and filters
   const filteredPatients = patients.filter(patient => {
     const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,11 +164,14 @@ const PatientManagement = () => {
   const handleAddPatient = () => {
     // Generate a unique ID that doesn't conflict with existing patients
     const generateUniqueId = () => {
+      const isIdTaken = (id) => patients.some(p => p.id === id);
+      
       let newId;
       do {
         const randomNum = Math.floor(Math.random() * 1000);
         newId = `KP-2024-${String(randomNum).padStart(3, '0')}`;
-      } while (patients.some(p => p.id === newId));
+      } while (isIdTaken(newId));
+      
       return newId;
     };
 
@@ -185,6 +215,44 @@ const PatientManagement = () => {
     setSelectedPatient(null);
   };
 
+  const handleDeletePatient = (patientId, patientName) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete patient "${patientName}"?\n\nThis action cannot be undone and will permanently remove all patient data from the system.`
+    );
+    
+    if (confirmed) {
+      // Remove patient from the list
+      setPatients(prev => prev.filter(p => p.id !== patientId));
+      
+      // Show success message (in a real app, you might want to use a toast notification)
+      alert(`Patient "${patientName}" has been successfully deleted from the system.`);
+    }
+  };
+
+  // Notification handlers
+  const handleNotificationToggle = () => {
+    setIsNotificationPanelOpen(!isNotificationPanelOpen);
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  };
+
+  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -207,15 +275,51 @@ const PatientManagement = () => {
                 Dashboard
               </Link>
               <Link 
+                to="/schedule-management" 
+                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+              >
+                Schedule
+              </Link>
+              <Link 
                 to="/doctor-profile" 
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
               >
                 Profile
               </Link>
+              
+              {/* Doctor Profile Display */}
+              <div className="flex items-center space-x-3 px-3 py-1 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-green-600">{doctorInfo.initials}</span>
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-gray-900">{doctorInfo.name}</p>
+                  <p className="text-xs text-gray-500">{doctorInfo.specialty}</p>
+                </div>
+              </div>
+              
+              {/* Notification Bell */}
+              <button
+                onClick={handleNotificationToggle}
+                className="relative p-2 text-gray-500 hover:text-gray-700 rounded-md transition duration-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM12 17H7a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4h-5z" />
+                </svg>
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
+
               <Link 
                 to="/" 
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-300 border border-red-200 hover:border-red-300"
               >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
                 Logout
               </Link>
             </div>
@@ -393,7 +497,11 @@ const PatientManagement = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </button>
-                        <button className="text-red-600 hover:text-red-900 transition duration-300" title="Delete Patient">
+                        <button 
+                          onClick={() => handleDeletePatient(patient.id, patient.name)}
+                          className="text-red-600 hover:text-red-900 transition duration-300" 
+                          title="Delete Patient"
+                        >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
@@ -492,12 +600,22 @@ const PatientManagement = () => {
       </main>
 
       {/* Patient Modal */}
+      {/* Patient Modal */}
       <PatientModal
         patient={selectedPatient}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSavePatient}
         mode={modalMode}
+      />
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={isNotificationPanelOpen}
+        onClose={() => setIsNotificationPanelOpen(false)}
+        notifications={notifications}
+        onMarkAsRead={handleMarkAsRead}
+        onMarkAllAsRead={handleMarkAllAsRead}
       />
     </div>
   );

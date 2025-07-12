@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import NotificationPanel from './NotificationPanel';
 
 const DoctorProfile = () => {
   // Mock doctor data - in a real app, this would come from an API
@@ -31,6 +32,20 @@ const DoctorProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
   const [activeTab, setActiveTab] = useState('personal');
+
+  // State for notifications
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'donor_approved',
+      title: 'Profile Updated',
+      message: 'Your doctor profile has been successfully updated',
+      timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+      read: false,
+      actionRequired: false
+    }
+  ]);
 
   // Initialize edited profile when entering edit mode
   const handleEditStart = () => {
@@ -68,6 +83,36 @@ const DoctorProfile = () => {
     setIsEditing(false);
   };
 
+  // Notification handlers
+  const handleNotificationToggle = () => {
+    setIsNotificationPanelOpen(!isNotificationPanelOpen);
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  };
+
+  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+
+  // Doctor info for navbar
+  const doctorInfo = {
+    name: `Dr. ${doctorProfile.firstName} ${doctorProfile.lastName}`,
+    initials: `${doctorProfile.firstName[0]}${doctorProfile.lastName[0]}`,
+    specialty: doctorProfile.specialization
+  };
+
   const currentProfile = isEditing ? editedProfile : doctorProfile;
 
   return (
@@ -98,9 +143,45 @@ const DoctorProfile = () => {
                 Patients
               </Link>
               <Link 
-                to="/" 
+                to="/schedule-management" 
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
               >
+                Schedule
+              </Link>
+              
+              {/* Doctor Profile Display - Current Page */}
+              <div className="flex items-center space-x-3 px-3 py-1 bg-green-50 rounded-lg border border-green-200">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-green-600">{doctorInfo.initials}</span>
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-green-700">{doctorInfo.name}</p>
+                  <p className="text-xs text-green-600">{doctorInfo.specialty}</p>
+                </div>
+              </div>
+              
+              {/* Notification Bell */}
+              <button
+                onClick={handleNotificationToggle}
+                className="relative p-2 text-gray-500 hover:text-gray-700 rounded-md transition duration-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM12 17H7a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4h-5z" />
+                </svg>
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
+
+              <Link 
+                to="/" 
+                className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-300 border border-red-200 hover:border-red-300"
+              >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
                 Logout
               </Link>
             </div>
@@ -516,6 +597,15 @@ const DoctorProfile = () => {
           </div>
         )}
       </main>
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={isNotificationPanelOpen}
+        onClose={() => setIsNotificationPanelOpen(false)}
+        notifications={notifications}
+        onMarkAsRead={handleMarkAsRead}
+        onMarkAllAsRead={handleMarkAllAsRead}
+      />
     </div>
   );
 };
