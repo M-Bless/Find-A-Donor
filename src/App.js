@@ -8,6 +8,7 @@ import PatientManagement from './components/PatientManagement';
 import DoctorProfile from './components/DoctorProfile';
 import DonorDashboard from './components/DonorDashboard';
 import ScheduleManagement from './components/ScheduleManagement';
+import SettingsDonor from './components/SettingsDonor';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/schedule-management" element={<ScheduleManagement />} />
           <Route path="/doctor-profile" element={<DoctorProfile />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
+          <Route path="/settings-donor" element={<SettingsDonor />} />
         </Routes>
       </div>
     </Router>
