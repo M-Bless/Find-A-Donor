@@ -9,6 +9,8 @@ import DoctorProfile from './components/DoctorProfile';
 import DonorDashboard from './components/DonorDashboard';
 import ScheduleManagement from './components/ScheduleManagement';
 import SettingsDonor from './components/SettingsDonor';
+import HospitalDashboard from './components/HospitalAdmin';
+import DoctorManagement from './components/DoctorManagement';
 
 function App() {
   return (
