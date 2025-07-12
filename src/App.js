@@ -24,6 +24,8 @@ function App() {
           <Route path="/doctor-profile" element={<DoctorProfile />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
           <Route path="/settings-donor" element={<SettingsDonor />} />
+          <Route path="/hospital-admin" element={<HospitalDashboard />} />
+          <Route path="/doctor-management" element={<DoctorManagement />} />
         </Routes>
       </div>
     </Router>
