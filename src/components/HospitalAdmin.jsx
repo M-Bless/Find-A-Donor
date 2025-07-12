@@ -31,18 +31,18 @@ const HospitalDashboard = () => {
                 Find A Donor
               </Link>
               <span className="ml-4 text-gray-500">|</span>
-              <h1 className="ml-4 text-xl font-semibold text-gray-900">Hospital Dashboard</h1>
+              <h1 className="ml-4 text-xl font-semibold text-gray-900">Admin Dashboard</h1>
             </div>
 
             <div className="flex items-center space-x-4">
               <Link 
-                to="/hospital-management" 
+                to="/doctor-management" 
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
               >
-                Hospitals
+                Doctors
               </Link>
               <Link 
-                to="/hospital-profile" 
+                to="/admin-profile" 
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
               >
                 Profile
