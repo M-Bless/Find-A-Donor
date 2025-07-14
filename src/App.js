@@ -11,6 +11,7 @@ import ScheduleManagement from './components/ScheduleManagement';
 import SettingsDonor from './components/SettingsDonor';
 import HospitalDashboard from './components/HospitalAdmin';
 import DoctorManagement from './components/DoctorManagement';
+import AdminLogin from './components/AdminLogin';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin-login" element={<AdminLogin/>}/>
           <Route path="/signup" element={<Signup />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/patient-management" element={<PatientManagement />} />

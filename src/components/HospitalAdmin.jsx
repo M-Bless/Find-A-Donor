@@ -16,7 +16,6 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
-  Legend,
   Cell
 } from 'recharts';
 
@@ -104,14 +103,27 @@ const chartStats = [
                   <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                   <YAxis />
                   <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" barSize={40} radius={[6, 6, 0, 0]} name="Statistics">
+                  {/* Remove default legend */}
+                  <Bar dataKey="value" barSize={40} radius={[6, 6, 0, 0]}>
                     {chartStats.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              <div className="flex justify-center mt-4">
+                <div className="flex flex-wrap gap-6">
+                  {chartStats.map((entry, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div
+                        className="w-4 h-4 rounded-sm"
+                        style={{ backgroundColor: entry.color }}
+                      />
+                      <span className="text-sm text-gray-700">{entry.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
           </div>
         </main>
       </div>
