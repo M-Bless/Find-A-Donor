@@ -12,6 +12,7 @@ import SettingsDonor from './components/SettingsDonor';
 import HospitalDashboard from './components/HospitalAdmin';
 import DoctorManagement from './components/DoctorManagement';
 import AdminLogin from './components/AdminLogin';
+import AdminProfile from './components/AdminProfile';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/settings-donor" element={<SettingsDonor />} />
           <Route path="/hospital-admin" element={<HospitalDashboard />} />
           <Route path="/doctor-management" element={<DoctorManagement />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Routes>
       </div>
     </Router>

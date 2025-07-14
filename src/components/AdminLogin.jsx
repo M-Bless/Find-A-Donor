@@ -20,7 +20,7 @@ const AdminLogin = () => {
       // TODO: Replace with actual authentication logic
       if (email === 'admin@example.com' && password === 'admin123') {
         // Navigate to dashboard
-        navigate('/admin-dashboard');
+        navigate('/hospital-admin');
       } else {
         setError('Invalid credentials');
       }
