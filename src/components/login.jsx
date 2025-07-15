@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState('donor');
-  const [showPassword, setShowPassword] = useState(false); // 👈 for toggle
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     emailOrUsername: '',
     password: '',
@@ -17,20 +19,83 @@ const Login = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Email/Username validation
+    if (!formData.emailOrUsername.trim()) {
+      newErrors.emailOrUsername = 'Email or username is required';
+    } else if (formData.emailOrUsername.includes('@') && !validateEmail(formData.emailOrUsername)) {
+      newErrors.emailOrUsername = 'Please enter a valid email address';
+    } else if (formData.emailOrUsername.trim().length < 3) {
+      newErrors.emailOrUsername = 'Username must be at least 3 characters';
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.emailOrUsername && formData.password) {
+    // Validate form
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulate potential authentication errors (randomly for demo)
+      const random = Math.random();
+      if (random > 0.7) {
+        throw new Error('Invalid email/username or password');
+      } else if (random > 0.6) {
+        throw new Error('Account is temporarily locked. Please try again later.');
+      } else if (random > 0.5) {
+        throw new Error('Server error. Please try again.');
+      }
+      
+      // Success - redirect based on role
       if (selectedRole === 'medical') {
         navigate('/doctor-dashboard');
       } else {
-        alert('Login successful! Welcome, Living Donor.');
         navigate('/donor-dashboard');
       }
-    } else {
-      alert('Please fill in all required fields.');
+    } catch (error) {
+      setErrors({
+        submit: error.message || 'Login failed. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,6 +112,18 @@ const Login = () => {
         </div>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Global Error Message */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="flex">
+                <svg className="w-5 h-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {errors.submit}
+              </div>
+            </div>
+          )}
+
           {/* Role Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -95,8 +172,8 @@ const Login = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span className="text-sm font-medium text-gray-900">Medical Professional</span>
-                    <span className="text-xs text-gray-500 mt-1">Manages Patients & Donors</span>
+                    <span className="text-sm font-medium text-gray-900">Medical Practitioner</span>
+                    <span className="text-xs text-gray-500 mt-1">Manages Patients & Donor matches</span>
                   </div>
                 </div>
               </label>
@@ -116,10 +193,14 @@ const Login = () => {
               name="emailOrUsername"
               value={formData.emailOrUsername}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 ${
+                errors.emailOrUsername ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               placeholder="Enter your email or username"
-              required
             />
+            {errors.emailOrUsername && (
+              <p className="mt-1 text-sm text-red-600">{errors.emailOrUsername}</p>
+            )}
           </div>
 
           {/* Password Input with Toggle */}
@@ -133,9 +214,10 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 pr-12 ${
+                  errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 placeholder="Enter your password"
-                required
               />
               <button
                 type="button"
@@ -159,6 +241,9 @@ const Login = () => {
                 )}
               </button>
             </div>
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            )}
           </div>
 
           {/* Remember Me */}
@@ -176,17 +261,35 @@ const Login = () => {
                 Remember me
               </label>
             </div>
-            <a href="#" className="text-sm text-green-600 hover:text-green-700 transition duration-300">
+            <button 
+              type="button"
+              className="text-sm text-green-600 hover:text-green-700 transition duration-300 bg-transparent border-none cursor-pointer"
+            >
               Forgot password?
-            </a>
+            </button>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition duration-300 shadow-lg"
+            disabled={isLoading}
+            className={`w-full py-3 px-4 rounded-lg font-semibold transition duration-300 shadow-lg ${
+              isLoading
+                ? 'bg-gray-400 cursor-not-allowed text-white'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
           >
-            Sign In as {selectedRole === 'donor' ? 'Living Donor' : 'Medical Professional'}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+              </div>
+            ) : (
+              `Sign In as ${selectedRole === 'donor' ? 'Living Donor' : 'Medical Professional'}`
+            )}
           </button>
         </form>
 
