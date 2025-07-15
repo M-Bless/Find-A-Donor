@@ -1,10 +1,3 @@
-/* ─────────────────────────────── Home.jsx ────────────────────────────────
-   • Hamburger button is visible only below the md breakpoint (768 px).
-   • Clicking it reveals a slide‑down menu with the same nav + auth/CTA items.
-   • Desktop (> = md) shows the normal navbar without the hamburger.
-   • All hero, about, testimonials, footer content, images, and copy are the
-     same as your original; only responsive nav behaviour was added.         */
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -67,8 +60,8 @@ const Home = () => {
     },
   ];
 
-  const [current, setCurrent]   = useState(0);
-  const [mobileOpen, setOpen]   = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [mobileOpen, setOpen] = useState(false);
 
   const next  = () => setCurrent((i) => (i + 1) % testimonials.length);
   const prev  = () => setCurrent((i) => (i === 0 ? testimonials.length - 1 : i - 1));
@@ -110,11 +103,11 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* hamburger (mobile only) */}
+          {/* hamburger (mobile & tablet only) */}
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
-            className="ml-auto flex md:hidden items-center text-gray-700 hover:text-green-600"
+            className="ml-auto inline-flex items-center text-gray-700 hover:text-green-600 lg:hidden"
           >
             {mobileOpen ? (
               <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -128,9 +121,9 @@ const Home = () => {
           </button>
         </div>
 
-        {/* mobile slide‑down menu */}
+        {/* mobile slide‑down menu (hidden ≥ lg) */}
         {mobileOpen && (
-          <div className="md:hidden bg-white shadow-inner border-t border-gray-200">
+          <div className="lg:hidden bg-white shadow-inner border-t border-gray-200">
             <ul className="space-y-1 px-4 pt-4 pb-2 text-sm font-medium">
               {['Home', 'About', 'Testimonials'].map((label) => (
                 <li key={label}>
