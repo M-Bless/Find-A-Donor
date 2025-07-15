@@ -13,6 +13,7 @@ import HospitalDashboard from './components/HospitalAdmin';
 import DoctorManagement from './components/DoctorManagement';
 import AdminLogin from './components/AdminLogin';
 import AdminProfile from './components/AdminProfile';
+import PatientAdmin from './components/PatientAdmin';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/hospital-admin" element={<HospitalDashboard />} />
           <Route path="/doctor-management" element={<DoctorManagement />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
+          <Route path="/patient-admin" element={<PatientAdmin />} />
         </Routes>
       </div>
     </Router>

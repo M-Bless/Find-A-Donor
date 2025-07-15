@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, Pencil, Trash2, UserPlus } from 'lucide-react';
 
+
 // Simple Navbar Component
 const Navbar = () => (
   <nav className="bg-white shadow mb-8">
@@ -9,8 +10,8 @@ const Navbar = () => (
       <ul className="flex space-x-6 text-gray-700 font-medium">
         <li><a href="/hospital-admin" className="hover:text-green-700">Dashboard</a></li>
         <li><a href="/doctor-management" className="hover:text-green-700">Doctors</a></li>
-        <li><a href="/patient-management" className="hover:text-green-700">Patients</a></li>
-        <li><a href="/logout" className="hover:text-green-700">Logout</a></li>
+        <li><a href="/patient-admin" className="hover:text-green-700">Patients</a></li>
+        <li><a href="/" className="hover:text-green-700">Logout</a></li>
       </ul>
     </div>
   </nav>

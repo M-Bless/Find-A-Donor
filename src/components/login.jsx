@@ -87,8 +87,10 @@ const Login = () => {
       // Success - redirect based on role
       if (selectedRole === 'medical') {
         navigate('/doctor-dashboard');
-      } else {
+      } else if (selectedRole === 'donor') {
         navigate('/donor-dashboard');
+      } else if (selectedRole === 'hospitalAdmin') {
+        navigate('/hospital-admin');
       }
     } catch (error) {
       setErrors({
@@ -129,7 +131,33 @@ const Login = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Select Your Role
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            
+            {/* Top Row - Hospital Admin and Donor */}
+            <div className="grid grid-cols-2 gap-4 mb-3">
+              {/* Hospital Admin Role */}
+              <label className='relative cursor-pointer'>
+                <input
+                  type="radio"
+                  name="role"
+                  value="hospitalAdmin"
+                  checked={selectedRole === 'hospitalAdmin'}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  className="sr-only"
+                />
+                <div className={`border-2 rounded-lg p-4 transition duration-200 ${
+                  selectedRole === 'hospitalAdmin' ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white hover:border-green-500'
+                }`}>
+                  <div className="flex flex-col items-center text-center">
+                    <svg className="w-7 h-7 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m6-6a2 2 0 11-4 0 2 2 0 014 0zM5.5 19h13a2.5 2.5 0 002.5-2.5V7a2.5 2.5 0 00-2.5-2.5h-13A2.5 2.5 0 005.5 7v9.5A2.5 2.5 0 008 19z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-900">Hospital Admin</span>
+                    <span className="text-xs text-gray-500 mt-1">Manage Hospital</span>
+                  </div>
+                </div>
+              </label>
+
               {/* Donor Role */}
               <label className="relative cursor-pointer">
                 <input
@@ -144,18 +172,20 @@ const Login = () => {
                   selectedRole === 'donor' ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white hover:border-green-500'
                 }`}>
                   <div className="flex flex-col items-center text-center">
-                    <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-7 h-7 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                     <span className="text-sm font-medium text-gray-900">Living Donor</span>
-                    <span className="text-xs text-gray-500 mt-1">Kidney Donor Volunteer</span>
+                    <span className="text-xs text-gray-500 mt-1">Kidney Volunteer</span>
                   </div>
                 </div>
               </label>
+            </div>
 
-              {/* Medical Role */}
-              <label className="relative cursor-pointer">
+            {/* Bottom Row - Medical Professional (Centered) */}
+            <div className="flex justify-center">
+              <label className="relative cursor-pointer w-full max-w-[200px]">
                 <input
                   type="radio"
                   name="role"
@@ -267,9 +297,7 @@ const Login = () => {
             >
               Forgot password?
             </button>
-          </div>
-
-          {/* Submit Button */}
+          </div>          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -288,12 +316,18 @@ const Login = () => {
                 Signing In...
               </div>
             ) : (
-              `Sign In as ${selectedRole === 'donor' ? 'Living Donor' : 'Medical Professional'}`
+              `Sign In as ${
+                selectedRole === 'donor'
+                  ? 'Living Donor'
+                  : selectedRole === 'medical'
+                  ? 'Medical Professional'
+                  : 'Hospital Admin'
+              }`
             )}
           </button>
         </form>
 
-        {/* Footer Links */}
+              {/* Footer Links */}
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Don't have an account?{' '}
